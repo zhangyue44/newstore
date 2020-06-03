@@ -3,7 +3,7 @@ const mutations = {
         payload.count++
     },
     addpayload(state, payload) {
-        payload.count = 1;
+        // payload.count = 1;
         payload.checked = true; //商品加进去时就是已经选择
         state.cartList.push(payload)
     },

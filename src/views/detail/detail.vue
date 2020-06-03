@@ -13,6 +13,9 @@
   <back-top @click.native="backtop" v-show="isShowBT"></back-top>
   <detail-bottom-bar @addToCart="addToCart"></detail-bottom-bar>
   <toast></toast>
+  <detail-cart-info v-show="isShowCartInfo" class="xain" :cartDetail="cartDetail" 
+  v-if="Object.keys(cartDetail).length !== 0" @showDetailss="showDetailss"
+  @addCart="addCart"></detail-cart-info>
 </div>
 </template>
 
@@ -28,6 +31,8 @@ import Goods from 'components/content/Goods/Goods'  //推荐模块，不过引�
 import BackTop from 'components/content/backtop/BackTop'  //返回顶部模块
 import DetailBottomBar from './detailChildren/detailBottomBar' //购物车模块
 import Toast from 'components/common/toast/Toast' //吐司模块
+
+import DetailCartInfo from './detailChildren/detailCartInfo' //后面自己添加的添加购物车详情模块
 
 import Scroll from 'components/common/scroll/Scroll'  //引入scroll模块
 import {getDetail, Goodss, Shop, GoodsParam, getRecommend} from 'network/detail' //获取详情页数据
@@ -48,6 +53,7 @@ components: {
   BackTop,
   DetailBottomBar,
   Toast,
+  DetailCartInfo,
 },
 data() {
   return {
@@ -62,6 +68,8 @@ data() {
     offsetT: [], //设置一个数组，用来放置4个参数的y轴值
     currentIndex: 0,
     isShowBT: false,
+    isShowCartInfo: false, //是否显示自己添加的购物车详情模块
+    cartDetail: {},
   }
 },
 created() {
@@ -109,17 +117,28 @@ methods: {
   backtop() {    //返回顶部
     this.$refs.scroll.scrollTo(0, 0)
   },
+  showDetailss() {
+    this.isShowCartInfo = false;
+  },
   addToCart() { //点击加入购物车
-    // 2.将需要的商品信息添加到Store中
+    this.isShowCartInfo = true; 
+  },
+  addCart(color,size,img,price,goodsCount) {  // 2.将需要的商品信息添加到Store中
+  this.isShowCartInfo = false;
     const obj = {}
     obj.iid = this.iid
-    obj.imgURL = this.topImages[0]
     obj.title = this.goods.title
-    obj.desc = this.goods.desc
-    obj.price = this.goods.realPrice
+    obj.color = color
+    obj.size = size
+    obj.image = img
+    obj.price = price
+    obj.count = goodsCount
+    // obj.imgURL = this.topImages[0]
+    // obj.desc = this.goods.desc
+    // obj.price = this.goods.realPrice
     
     this.$store.dispatch('addToCart', obj).then(() => { //传递给vuex一个异步函数，携带obj参数
-    this.$toast({message: '加入购物车成功'})  //回调函数
+    this.$toast({message: '加入购物车成功'})  //回调函数，吐司模块
     })
   },
 
@@ -128,7 +147,7 @@ methods: {
   getDetail() {
     getDetail(this.iid).then(res => {
       // 1.获取顶部的图片轮播数据
-        const data = res.result;
+        const data = res.result;       
         this.topImages = data.itemInfo.topImages
         // 2.获取商品信息
         this.goods = new Goodss(data.itemInfo, data.columns, data.shopInfo.services)        
@@ -141,7 +160,9 @@ methods: {
         // 6.用户评价信息
          if (data.rate.list) {
 		        this.commentInfo = data.rate.list[0];
-	        }     
+        }   
+        //7.获取购物车详情数据
+        this.cartDetail = data.skuInfo;            
     })
   },
   getRecommend() {  //获取推荐模块数据
@@ -165,6 +186,16 @@ methods: {
 .detailnb {
   position: relative;
   z-index: 9;
+  background-color: #fff;
+}
+.xain {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  width: 100%;
+  height: 70%;
   background-color: #fff;
 }
 </style>

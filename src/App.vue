@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import BottomTabBar from 'components/content/bottomTabBar/bottomTabBar' //低部导航模块
+import BottomTabBar from 'components/content/bottomTabBar/bottomTabBar' //底部导航模块
 
 export default {
   name: 'App',

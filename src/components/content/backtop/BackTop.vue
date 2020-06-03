@@ -8,7 +8,6 @@
 
 export default {
 name: 'BackTop',
-components: {},
 }
 </script>
 <style scoped>
